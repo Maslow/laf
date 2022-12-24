@@ -111,6 +111,7 @@ model Application {
   runtime       Runtime                   @relation(fields: [runtimeName], references: [name])
   bundle        Bundle                    @relation(fields: [bundleName], references: [name])
   configuration ApplicationConfiguration?
+  database      Database?
 }
 
 type EnvironmentVariable {
@@ -128,6 +129,67 @@ model ApplicationConfiguration {
   updatedAt DateTime @updatedAt
 
   application Application @relation(fields: [appid], references: [appid])
+}
+
+type DatabaseStatus {
+  ready         Boolean @default(false)
+  connectionUri String?
+  capacity      Int     @default(0)
+}
+
+enum DatabaseState {
+  Creating
+  Created
+  Deleting
+  Deleted
+}
+
+model Database {
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  appid     String         @unique
+  name      String
+  username  String
+  password  String
+  provider  String
+  state     DatabaseState
+  status    DatabaseStatus
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  application Application @relation(fields: [appid], references: [appid])
+}
+
+type ObjectStorageStatus {
+  ready            Boolean
+  externalEndpoint String
+  internalEndpoint String
+  region           String
+}
+
+model ObjectStorage {
+  id        String              @id @default(auto()) @map("_id") @db.ObjectId
+  appid     String
+  username  String
+  password  String
+  provider  String
+  status    ObjectStorageStatus
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+type BucketStatus {
+  capacity Int
+}
+
+model Bucket {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  appid     String
+  name      String
+  shortName String
+  capacity  Int
+  status    BucketStatus
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }
 
 model DatabasePolicy {
@@ -175,3 +237,5 @@ model CloudFunction {
 
   @@unique([appid, name])
 }
+
+
