@@ -51,7 +51,7 @@ model PersonalAccessToken {
   user User @relation(fields: [uid], references: [id])
 }
 
-// region schemas 
+// region schemas
 
 type RegionClusterConf {
   driver     String // kubernetes
@@ -449,4 +449,28 @@ model WebsiteHosting {
   lockedAt   DateTime
 
   bucket StorageBucket @relation(fields: [bucketName], references: [name])
+}
+
+model Settings {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  key   String @unique
+  value String
+}
+
+enum SmsVerifyCodeType {
+  Login
+  Register
+  ResetPassword
+}
+
+// Sms schemas
+model SmsVerifyCode {
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
+  phone     String
+  code      String
+  ip        String
+  type      SmsVerifyCodeType
+  state     Int               @default(0) // 0: created, 1: used
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 }
