@@ -7,6 +7,7 @@ import {
   UseGuards,
   Req,
   Logger,
+  UseInterceptors,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { IRequest } from '../utils/interface'
@@ -19,10 +20,12 @@ import { FunctionService } from '../function/function.service'
 import { StorageService } from 'src/storage/storage.service'
 import { RegionService } from 'src/region/region.service'
 import { SubscriptionPhase } from '@prisma/client'
+import { HttpInterceptor } from 'src/extension/http.interceptor'
 
 @ApiTags('Application')
 @Controller('applications')
 @ApiBearerAuth('Authorization')
+@UseInterceptors(HttpInterceptor)
 export class ApplicationController {
   private logger = new Logger(ApplicationController.name)
 
